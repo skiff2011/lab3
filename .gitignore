@@ -1,0 +1,69 @@
+# IntelliJ IDEA specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Build output directories
+out/
+build/
+bin/
+
+# Gradle specific files
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+
+# Log files
+*.log
+
+# Kotlin specific files
+*.class
+*.jar
+*.war
+*.ear
+*.apk
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Cache and temporary files
+*.tmp
+*.swp
+*.swo
+*.swn
+*.bak
+*.replaced
+
+# Testing-related
+test-results/
+*.test.xml
+
+# User settings
+*.env
+*.local
+*.key
+*.crt
+*.pem
+
+# IDEA project files
+*.idea/
+
+# Node/NPM files if a frontend is present
+node_modules/
+package-lock.json
+yarn.lock
+
+# Kotlin specific cache files
+.kts/.gradle/
+
+# Other generated files
+*.gz
+*.zip
+*.tar
+*.7z
+*.xz
+*.lock
+
+config.properties

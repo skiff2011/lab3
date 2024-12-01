@@ -5,38 +5,36 @@ import org.jsoup.Jsoup
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
+import kotlin.time.measureTimedValue
 
 class AndroidSearchBot : TelegramLongPollingBot(loadToken()) {
-
-    val logger = FluentLogger.getLogger("myapp", "localhost", 8080)
-
     override fun getBotUsername(): String = BOT_NAME
 
     override fun onUpdateReceived(update: Update) {
+        val message = update.message.text
+        val chatId = update.message.chatId
+        val userId = update.message.from.id
+
+        val logs = mutableMapOf<String, Any>(
+            USER_ID_KEY to userId,
+            QUERY_KEY to message,
+        )
+
+
         if (update.hasMessage() && update.message.hasText()) {
-            val message = update.message.text
-            val chatId = update.message.chatId
-
-            val userId = update.message.from.id
-
-            val logs = mapOf(
-                "UserId" to userId,
-                "query" to message,
-            )
-
-            logger.log("UserData", logs)
-
             val reply = when (message) {
                 START_MESSAGE -> printGreeting(chatId)
-                else -> performSearch(chatId, message)
+                else -> performSearch(chatId, message, logs)
             }
 
             try {
                 execute(reply)
             } catch (e: Exception) {
                 e.printStackTrace()
+                logs[SEARCH_RESULT_SUCCESS_KEY] = false
             }
         }
+        logger.log("UserData", logs.toMap())
     }
 
     private fun printGreeting(chatId: Long): SendMessage {
@@ -46,8 +44,14 @@ class AndroidSearchBot : TelegramLongPollingBot(loadToken()) {
         return replyMessage
     }
 
-    private fun performSearch(chatId: Long, query: String): SendMessage {
-        val links = searchAndroidDocumentation(query)
+    private fun performSearch(chatId: Long, query: String, logParams: MutableMap<String, Any>): SendMessage {
+        val (links, duration) = measureTimedValue {
+            searchAndroidDocumentation(query)
+        }
+
+        logParams[SEARCH_RESULT_COUNT_KEY] = links.size
+        logParams[SEARCH_RESULT_SUCCESS_KEY] = true
+        logParams[SEARCH_TIME_KEY] = duration.inWholeMilliseconds
 
         val replyMessage = SendMessage()
         replyMessage.chatId = chatId.toString()
@@ -95,7 +99,19 @@ class AndroidSearchBot : TelegramLongPollingBot(loadToken()) {
 
         return results
     }
+
+    companion object {
+        val logger: FluentLogger = FluentLogger.getLogger(TAG, HOST, PORT)
+    }
 }
 
+private const val TAG = "myapp"
+private const val HOST = "localhost"
+private const val PORT = 8080
 private const val BOT_NAME = "Lab3AndroidSearchBot"
 private const val START_MESSAGE = "/start"
+private const val USER_ID_KEY = "user_id"
+private const val QUERY_KEY = "query"
+private const val SEARCH_RESULT_COUNT_KEY = "search_result_count"
+private const val SEARCH_RESULT_SUCCESS_KEY = "search_success"
+private const val SEARCH_TIME_KEY = "search_time_millis"

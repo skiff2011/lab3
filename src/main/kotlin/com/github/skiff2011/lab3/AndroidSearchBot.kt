@@ -34,7 +34,7 @@ class AndroidSearchBot : TelegramLongPollingBot(loadToken()) {
                 logs[SEARCH_RESULT_SUCCESS_KEY] = false
             }
         }
-        logger.log("UserData", logs.toMap())
+        logger.log(USER_REQUEST_DATA, logs.toMap())
     }
 
     private fun printGreeting(chatId: Long): SendMessage {
@@ -115,3 +115,4 @@ private const val QUERY_KEY = "query"
 private const val SEARCH_RESULT_COUNT_KEY = "search_result_count"
 private const val SEARCH_RESULT_SUCCESS_KEY = "search_success"
 private const val SEARCH_TIME_KEY = "search_time_millis"
+private const val USER_REQUEST_DATA = "user_request_data"
